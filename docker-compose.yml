@@ -2,7 +2,6 @@ services:
   mysql:
     image: mysql:8
     platform: linux/amd64
-    container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: japanpost
@@ -17,7 +16,6 @@ services:
 
   otelcol:
     image: otel/opentelemetry-collector-contrib
-    container_name: otelcol
     ports:
       - 43188
     command: [ "--config=/etc/otelcol-config.yml" ]
