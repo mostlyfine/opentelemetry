@@ -1,0 +1,29 @@
+receivers:
+  mysql:
+    endpoint: mysql:3306
+    username: root
+    password: ${env:MYSQL_PASSWORD}
+    database: japanpost
+    collection_interval: 10s
+    initial_delay: 1s
+    statement_events:
+      digest_text_limit: 120
+      time_limit: 24h
+      limit: 250
+
+exporters:
+  otlp:
+    endpoint: http://signoz:4317
+    tls:
+      insecure: true
+
+processors:
+  resourcedetection:
+    detectors: [env, system]
+
+service:
+  pipelines:
+    metrics:
+      receivers: [mysql]
+      processors: [resourcedetection]
+      exporters: [otlp]

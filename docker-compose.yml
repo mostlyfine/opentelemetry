@@ -15,3 +15,14 @@ services:
     ports:
       - 3306
 
+  otelcol:
+    image: otel/opentelemetry-collector-contrib
+    container_name: otelcol
+    ports:
+      - 43188
+    command: [ "--config=/etc/otelcol-config.yml" ]
+    volumes:
+      - ./docker/otel-collector/config.yml:/etc/otelcol-config.yml
+    extra_hosts:
+      - signoz:host-gateway
+
