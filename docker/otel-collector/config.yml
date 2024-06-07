@@ -6,6 +6,8 @@ receivers:
     database: japanpost
     collection_interval: 10s
     initial_delay: 1s
+    tls:
+      insecure: true
     statement_events:
       digest_text_limit: 120
       time_limit: 24h

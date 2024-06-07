@@ -19,6 +19,8 @@ services:
     ports:
       - 43188
     command: [ "--config=/etc/otelcol-config.yml" ]
+    environment:
+      MYSQL_PASSWORD: root
     volumes:
       - ./docker/otel-collector/config.yml:/etc/otelcol-config.yml
     extra_hosts:
