@@ -1,4 +1,7 @@
 receivers:
+  nginx:
+    endpoint: "http://nginx:80/status"
+
   mysql:
     endpoint: mysql:3306
     username: root
@@ -22,10 +25,15 @@ exporters:
 processors:
   resourcedetection:
     detectors: [env, system]
+  batch:
 
 service:
   pipelines:
-    metrics:
+    metrics/mysql:
       receivers: [mysql]
       processors: [resourcedetection]
+      exporters: [otlp]
+    metrics/nginx:
+      receivers: [nginx]
+      processors: [batch]
       exporters: [otlp]

@@ -1,4 +1,13 @@
 services:
+  nginx:
+    image: nginx:stable-alpine-otel
+    ports:
+      - 80:80
+    volumes:
+      - ./docker/web/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/web/conf.d:/etc/nginx/conf.d
+    extra_hosts:
+      - signoz:host-gateway
   mysql:
     image: mysql:8
     platform: linux/amd64
@@ -16,8 +25,6 @@ services:
 
   otelcol:
     image: otel/opentelemetry-collector-contrib
-    ports:
-      - 43188
     command: [ "--config=/etc/otelcol-config.yml" ]
     environment:
       MYSQL_PASSWORD: root
