@@ -1,0 +1,10 @@
+fastapi
+mysql-connector-python
+opentelemetry-distro
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation
+pydantic
+python-json-logger
+sqlalchemy
+strawberry-graphql
+uvicorn

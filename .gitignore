@@ -1,0 +1,4 @@
+*.swp
+.envrc
+.tool-versions
+__pycache__/

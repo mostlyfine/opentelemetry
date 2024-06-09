@@ -7,6 +7,28 @@ services:
     volumes:
       - ./docker/web/nginx.conf:/etc/nginx/nginx.conf
       - ./docker/web/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - backend
+    extra_hosts:
+      - signoz:host-gateway
+  backend:
+    container_name: backend-container
+    build:
+      context: ./docker/backend/python
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: service.name=backend_service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      DB_USER: docker
+      DB_PASSWORD: docker
+      DB_HOST: db
+      DATABASE: japanpost
+    volumes:
+      - ./docker/backend/python/app:/app
+    ports:
+      - 5002
+    depends_on:
+      - db
     extra_hosts:
       - signoz:host-gateway
   db:
