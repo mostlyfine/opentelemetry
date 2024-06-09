@@ -1,6 +1,7 @@
 services:
-  nginx:
+  web:
     image: nginx:stable-alpine-otel
+    container_name: nginx-container
     ports:
       - 80:80
     volumes:
@@ -8,14 +9,15 @@ services:
       - ./docker/web/conf.d:/etc/nginx/conf.d
     extra_hosts:
       - signoz:host-gateway
-  mysql:
+  db:
     image: mysql:8
     platform: linux/amd64
+    container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: japanpost
       MYSQL_USER: docker
-      MYSQL_PASSWORD: docker
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-docker}
       TZ: "Asia/Tokyo"
     volumes:
       - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
@@ -23,11 +25,13 @@ services:
     ports:
       - 3306
 
-  otelcol:
+  otelcol-gateway:
     image: otel/opentelemetry-collector-contrib
+    container_name: otelcol-gateway-container
     command: [ "--config=/etc/otelcol-config.yml" ]
     environment:
-      MYSQL_PASSWORD: root
+      MYSQL_OTELCOL_USER: ${MYSQL_OTELCOL_USER:-root}
+      MYSQL_OTELCOL_PASSWORD: ${MYSQL_OTELCOL_PASSWORD:-root}
     volumes:
       - ./docker/otel-collector/config.yml:/etc/otelcol-config.yml
     extra_hosts:
