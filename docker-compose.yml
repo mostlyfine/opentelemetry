@@ -7,6 +7,8 @@ services:
     volumes:
       - ./docker/web/nginx.conf:/etc/nginx/nginx.conf
       - ./docker/web/conf.d:/etc/nginx/conf.d
+    environment:
+      TZ: Asia/Tokyo
     depends_on:
       - backend
     extra_hosts:
@@ -23,6 +25,7 @@ services:
       DB_PASSWORD: docker
       DB_HOST: db
       DATABASE: japanpost
+      TZ: Asia/Tokyo
     volumes:
       - ./docker/backend/python/app:/app
     ports:
@@ -40,7 +43,7 @@ services:
       MYSQL_DATABASE: japanpost
       MYSQL_USER: docker
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-docker}
-      TZ: "Asia/Tokyo"
+      TZ: Asia/Tokyo
     volumes:
       - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./docker/db/sql:/docker-entrypoint-initdb.d
@@ -54,6 +57,7 @@ services:
     environment:
       MYSQL_OTELCOL_USER: ${MYSQL_OTELCOL_USER:-root}
       MYSQL_OTELCOL_PASSWORD: ${MYSQL_OTELCOL_PASSWORD:-root}
+      TZ: Asia/Tokyo
     volumes:
       - ./docker/otel-collector/config.yml:/etc/otelcol-config.yml
     extra_hosts:
