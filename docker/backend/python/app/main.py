@@ -1,6 +1,5 @@
-import sys
 import os
-from logging import getLogger, INFO, basicConfig
+from logging import getLogger
 from typing import List
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
@@ -14,11 +13,7 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 
-
-# logging
-basicConfig(stream=sys.stdout, level=INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = getLogger(__name__)
-
 
 # database
 DB_USER     = os.getenv('DB_USER')
