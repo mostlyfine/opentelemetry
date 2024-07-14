@@ -82,6 +82,13 @@ module "lgtm" {
             },
           ]
 
+          mount_points = [
+            {
+              sourceVolume  = "fargate-efs"
+              containerPath = "/data"
+            }
+          ]
+
           # health_check = {
           #   command = ["CMD-SHELL", "curl -sg 'http://localhost:9090/api/v1/query?query=up{job=\"opentelemetry-collector\"}' | jq -r .data.result[0].value[1] | grep '1' > /dev/null || exit 1"]
           # }
@@ -96,6 +103,16 @@ module "lgtm" {
       runtime_platform = {
         operating_system_family = "LINUX"
         cpu_architecture        = "X86_64"
+      }
+
+      volume = {
+        vol-1 = {
+          name = "fargate-efs"
+          efs_volume_configuration = {
+            file_system_id = module.efs.id
+            root_directory = "/"
+          }
+        }
       }
 
       subnet_ids       = module.vpc.public_subnets
