@@ -50,6 +50,16 @@ exporters:
     tls:
       insecure: true
 
+  otlphttp/mimir:
+    endpoint: http://mimir:9009/otlp
+    tls:
+      insecure: true
+
+  prometheusremotewrite:
+    endpoint: http://mimir:9009/api/v1/push
+    tls:
+      insecure: true
+
   otlphttp/traces:
     endpoint: http://tempo:4418
     tls:
@@ -79,7 +89,7 @@ service:
     metrics:
       receivers: [otlp, prometheus/collector, nginx]
       processors: [memory_limiter, batch]
-      exporters: [otlphttp/metrics]
+      exporters: [otlphttp/mimir]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]

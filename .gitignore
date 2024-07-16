@@ -3,4 +3,5 @@
 .envrc
 .tool-versions
 __pycache__/
+mimir/data/
 .terraform

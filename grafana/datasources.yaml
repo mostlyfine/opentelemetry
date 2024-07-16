@@ -26,7 +26,7 @@ datasources:
           value: 'service_name'
 
     serviceMap:
-      datasourceUid: 'prometheus'
+      datasourceUid: 'mimir'
     search:
       hide: false
     nodeGraph:
@@ -34,7 +34,7 @@ datasources:
     lokiSearch:
       datasourceUid: 'loki'
     tracesToMetrics:
-      datasourceUid: 'prometheus'
+      datasourceUid: 'mimir'
     tracesToProfiles:
       customQuery: false
       datasourceUid: "pyroscope"
@@ -65,3 +65,21 @@ datasources:
     minStep: 15s
     # backendType: pyroscope
 
+- name: Mimir
+  uid: mimir
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://mimir:9009/prometheus
+  version: 1
+  editable: true
+  jsonData:
+    httpHeaderName1: "X-Scope-OrgID"
+    timeInterval: 60s
+    exemplarTraceIdDestinations:
+      - name: traceID
+        datasourceUid: tempo
+        urlDisplayLabel: 'Trace: $${__value.raw}'
+  secureJsonData:
+    httpHeaderValue1: "demo"
+  isDefault: true

@@ -121,19 +121,14 @@ services:
       - 5002:5002
     depends_on:
       - opentelemetry-collector
-  # mongodb:
-  #   image: "mongo:latest"
-  #   container_name: mongodb
-  #   hostname: mongodb
-  #   restart: always
-  # 
-  # app:
-  #   image: "signoz/sample-flask-app:latest"
-  #   container_name: sample-flask
-  #   hostname: sample-flask
-  #   ports:
-  #     - 5002:5002
-  #   environment:
-  #     MONGO_HOST: mongodb
-  #     OTEL_RESOURCE_ATTRIBUTES: service.name=sample-flask
-  #     OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4317  # Replace to appropriate SigNoz OtelCollector endpoint, if applicable
+
+  mimir:
+    image: grafana/mimir:2.13.0
+    container_name: mimir
+    command: ["-config.file=/etc/mimir.yaml"]
+    hostname: mimir
+    volumes:
+      - ./mimir/mimir.yaml:/etc/mimir.yaml
+      - ./mimir/data:/data/mimir
+    ports:
+      - 9009:9009
