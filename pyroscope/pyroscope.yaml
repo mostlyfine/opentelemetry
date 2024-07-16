@@ -1,0 +1,9 @@
+server:
+  http_listen_port: 4040
+
+tracing:
+  enabled: true
+  profiling_enabled: true
+
+pyroscopedb:
+  max_block_duration: 5m
