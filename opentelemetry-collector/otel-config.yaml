@@ -14,19 +14,25 @@ receivers:
   prometheus/collector:
     config:
       scrape_configs:
-        - job_name: 'opentelemetry-collector-metrics'
+        - job_name: 'opentelemetry-collector'
           static_configs:
-            - targets: ['localhost:8888']
-        - job_name: 'grafana-metrics'
-          scrape_interval: 10s
+            - targets: ['opentelemetry-collector:8888']
+        - job_name: 'grafana'
           static_configs:
-          - targets: ['grafana:3000']
-        - job_name: 'loki-metrics'
-          dns_sd_configs:
-            - names:
-                - loki
-              type: A
-              port: 3100
+            - targets: ['grafana:3000']
+        - job_name: 'loki'
+          static_configs:
+            - targets: ['loki:3100']
+        - job_name: 'tempo'
+          static_configs:
+            - targets: ['tempo:3200']
+        - job_name: 'pyroscope'
+          static_configs:
+            - targets: ['pyroscope:4040']
+        - job_name: 'mimir'
+          static_configs:
+            - targets: ['mimir:9009']
+
 
   nginx:
     endpoint: "http://nginx:80/nginx_status"
