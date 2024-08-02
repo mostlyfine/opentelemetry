@@ -28,7 +28,7 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - prometheus
+      - mimir
       - tempo
       - loki
       - pyroscope
@@ -85,8 +85,11 @@ services:
     ports:
       - 4317:4317   # grpc
       - 4318:4318   # http
+      - 13133:13133 # healthcheck
+      - 1777:1777   # pprof
+      - 55679:55679 # zpages
     depends_on:
-      - prometheus
+      - mimir
       - tempo
       - loki
 
