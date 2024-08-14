@@ -39,6 +39,8 @@ receivers:
     collection_interval: 10s
 
   filelog:
+    resource:
+      service.name: nginx
     include:
       - '/var/log/nginx/access.log'
 
