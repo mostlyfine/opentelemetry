@@ -99,13 +99,13 @@ service:
       exporters: [otlphttp/traces]
     metrics:
       receivers: [otlp, prometheus/collector, nginx]
-      processors: [memory_limiter, batch]
+      processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/mimir]
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/logs]
     logs/nginx:
       receivers: [filelog]
-      processors: [memory_limiter, batch]
+      processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/logs]
