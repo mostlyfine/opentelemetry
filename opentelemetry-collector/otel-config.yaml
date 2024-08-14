@@ -52,8 +52,11 @@ processors:
     limit_mib: 500
     check_interval: 1s
 
+  resourcedetection:
+    detectors: [system]
+
 exporters:
-  otlphttp/metrics:
+  otlphttp/prometheus:
     endpoint: http://prometheus:9090/api/v1/otlp
     tls:
       insecure: true
