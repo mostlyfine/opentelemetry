@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+
+gem "rackup", "~> 2.1"
+gem "sinatra", "~> 4.0"
+gem "opentelemetry-sdk", "~> 1.5"
+gem "opentelemetry-exporter-otlp", "~> 0.28.1"
+gem "opentelemetry-instrumentation-sinatra", "~> 0.24.1"
+gem "pyroscope", "~> 0.5.12"
+
