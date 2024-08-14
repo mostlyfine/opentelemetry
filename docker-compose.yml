@@ -105,6 +105,7 @@ services:
       - ./pyroscope/pyroscope.yaml:/etc/pyroscope.yaml
     ports:
     - 4040:4040
+    - 4041:4041
 
   app:
     container_name: sample-app
