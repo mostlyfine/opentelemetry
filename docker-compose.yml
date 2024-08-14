@@ -6,7 +6,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/log:/var/log/nginx
+      - data-volume:/var/log/nginx
     ports:
       - 80:80
     depends_on:
@@ -16,6 +16,7 @@ services:
     container_name: grafana
     image: grafana/grafana:11.1.0
     volumes:
+      - data-volume:/data
       # - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       # - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
@@ -44,6 +45,7 @@ services:
       - "--enable-feature=otlp-write-receiver"
       - "--enable-feature=agent"
     volumes:
+      - data-volume:/data
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
@@ -54,6 +56,7 @@ services:
     command:
       - "-config.file=/etc/tempo.yaml"
     volumes:
+      - data-volume:/data
       - ./tempo/tempo.yaml:/etc/tempo.yaml
     ports:
       - 3200:3200 # http
@@ -69,6 +72,7 @@ services:
       - "-config.file=/etc/loki/loki.yaml"
       - "-print-config-stderr"  # for debug
     volumes:
+      - data-volume:/data
       - ./loki/loki.yaml:/etc/loki/loki.yaml
     ports:
       - 3100:3100 # http
@@ -80,8 +84,8 @@ services:
     command:
       - "--config=/etc/otel-config.yaml"
     volumes:
+      - data-volume:/var/log/nginx
       - ./opentelemetry-collector/otel-config.yaml:/etc/otel-config.yaml
-      - ./nginx/log:/var/log/nginx
     ports:
       - 4317:4317   # grpc
       - 4318:4318   # http
@@ -102,6 +106,7 @@ services:
       JAEGER_SAMPLER_TYPE: const
       JAEGER_SAMPLER_PARAM: 1
     volumes:
+      - data-volume:/data
       - ./pyroscope/pyroscope.yaml:/etc/pyroscope.yaml
     ports:
     - 4040:4040
@@ -131,7 +136,9 @@ services:
     command: ["-config.file=/etc/mimir.yaml"]
     hostname: mimir
     volumes:
+      - data-volume:/data
       - ./mimir/mimir.yaml:/etc/mimir.yaml
-      - ./mimir/data:/data/mimir
     ports:
       - 9009:9009
+volumes:
+  data-volume:

@@ -8,3 +8,4 @@ tracing:
 
 pyroscopedb:
   max_block_duration: 5m
+  data_path: /data/pyroscope
