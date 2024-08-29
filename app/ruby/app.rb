@@ -6,8 +6,7 @@ Bundler.require
 #ENV['OTEL_TRACES_EXPORTER'] ||= 'console'  # debug
 
 OpenTelemetry::SDK.configure do |c|
-  c.service_name = 'sample-app'
-  c.use 'OpenTelemetry::Instrumentation::Sinatra'
+  c.use_all
 end
 
 Pyroscope.configure do |c|
@@ -26,3 +25,11 @@ get "/" do
   response.to_json
 end
 
+
+get "/weather" do
+  content_type :json
+
+  uri = URI.parse("https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json")
+  response = Net::HTTP.get_response(uri)
+  response.body.force_encoding("UTF-8")
+end

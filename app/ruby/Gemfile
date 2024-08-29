@@ -8,6 +8,6 @@ gem "rackup", "~> 2.1"
 gem "sinatra", "~> 4.0"
 gem "opentelemetry-sdk", "~> 1.5"
 gem "opentelemetry-exporter-otlp", "~> 0.28.1"
-gem "opentelemetry-instrumentation-sinatra", "~> 0.24.1"
+gem "opentelemetry-instrumentation-all", "~> 0.63.0"
 gem "pyroscope", "~> 0.5.12"
 
