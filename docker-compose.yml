@@ -30,6 +30,7 @@ services:
       - 3000:3000
     depends_on:
       - mimir
+      - prometheus
       - tempo
       - loki
       - pyroscope
@@ -37,18 +38,19 @@ services:
 
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:v2.53.1
+    image: prom/prometheus:v2.54.1
+    hostname: prometheus
     command:
       - "--web.enable-remote-write-receiver"
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--enable-feature=otlp-write-receiver"
-      - "--enable-feature=agent"
+      # - "--enable-feature=agent"  # In agent mode, the process is not resident.
     volumes:
       - data-volume:/data
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - 9090:9090
+      - 9090
 
   tempo:
     container_name: tempo

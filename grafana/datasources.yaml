@@ -72,3 +72,15 @@ datasources:
   secureJsonData:
     httpHeaderValue1: "demo"
   isDefault: true
+
+- name: Prometheus
+  type: prometheus
+  uid: prometheus
+  url: http://prometheus:9090
+  jsonData:
+    timeInterval: 60s
+    exemplarTraceIdDestinations:
+      - name: traceID
+        datasourceUid: tempo
+        urlDisplayLabel: 'Trace: $${__value.raw}'
+
