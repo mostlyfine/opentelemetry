@@ -38,8 +38,9 @@ receivers:
     endpoint: "http://nginx:80/nginx_status"
     collection_interval: 10s
 
-  filelog:
+  filelog/nginx:
     resource:
+      service.namespace: sample
       service.name: nginx
     include:
       - '/var/log/nginx/access.log'
@@ -106,6 +107,6 @@ service:
       processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/logs]
     logs/nginx:
-      receivers: [filelog]
+      receivers: [filelog/nginx]
       processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/logs]
