@@ -1,25 +1,12 @@
 services:
-
-  nginx:
-    container_name: nginx
-    image: nginx:1.27-otel
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - data-volume:/var/log/nginx
-    ports:
-      - 80:80
-    depends_on:
-      - app
-
   grafana:
     container_name: grafana
-    image: grafana/grafana:11.1.0
+    image: grafana/grafana:11.2.0
     volumes:
       - data-volume:/data
       # - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
-      # - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -35,6 +22,20 @@ services:
       - loki
       - pyroscope
       - opentelemetry-collector
+
+  mimir:
+    image: grafana/mimir:2.13.0
+    container_name: mimir
+    command:
+      - "-config.file=/etc/mimir.yaml"
+      - "-query-frontend.query-result-response-format=protobuf"
+      - "-ingester.native-histograms-ingestion-enabled=true"
+    hostname: mimir
+    volumes:
+      - data-volume:/data
+      - ./mimir/mimir.yaml:/etc/mimir.yaml
+    ports:
+      - 9009
 
   prometheus:
     container_name: prometheus
@@ -61,43 +62,24 @@ services:
       - data-volume:/data
       - ./tempo/tempo.yaml:/etc/tempo.yaml
     ports:
-      - 3200:3200 # http
-      - 9096:9096 # grpc
-      - 4417:4417 # otlp grpc
-      - 4418:4418 # otlp http
-      - 14268:14268 # jaeger
+      - 3200 # http
+      - 9096 # grpc
+      - 4417 # otlp grpc
+      - 4418 # otlp http
+      - 14268 # jaeger
 
   loki:
     container_name: loki
     image: grafana/loki:3.1.0
     command:
       - "-config.file=/etc/loki/loki.yaml"
-      - "-print-config-stderr"  # for debug
+      # - "-print-config-stderr"  # for debug
     volumes:
       - data-volume:/data
       - ./loki/loki.yaml:/etc/loki/loki.yaml
     ports:
-      - 3100:3100 # http
-      - 9095:9095 # grpc
-
-  opentelemetry-collector:
-    container_name: opentelemetry-collector
-    image: otel/opentelemetry-collector-contrib:0.106.1
-    command:
-      - "--config=/etc/otel-config.yaml"
-    volumes:
-      - data-volume:/var/log/nginx
-      - ./opentelemetry-collector/otel-config.yaml:/etc/otel-config.yaml
-    ports:
-      - 4317:4317   # grpc
-      - 4318:4318   # http
-      - 13133:13133 # healthcheck
-      - 1777:1777   # pprof
-      - 55679:55679 # zpages
-    depends_on:
-      - mimir
-      - tempo
-      - loki
+      - 3100 # http
+      - 9095 # grpc
 
   pyroscope:
     container_name: pyroscope
@@ -111,36 +93,57 @@ services:
       - data-volume:/data
       - ./pyroscope/pyroscope.yaml:/etc/pyroscope.yaml
     ports:
-    - 4040:4040
-    - 4041:4041
+    - 4040  # http
+    - 4041  # grpc
+
+  opentelemetry-collector:
+    container_name: opentelemetry-collector
+    image: otel/opentelemetry-collector-contrib:0.108.0
+    command:
+      - "--config=/etc/otel-config.yaml"
+    volumes:
+      - log-volume:/var/log
+      - ./opentelemetry-collector/otel-config.yaml:/etc/otel-config.yaml
+    ports:
+      - 4317   # grpc
+      - 4318   # http
+      - 13133 # healthcheck
+      - 1777   # pprof
+      - 55679 # zpages
+    depends_on:
+      - mimir
+      - tempo
+      - loki
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.27-alpine-otel
+    volumes:
+      - log-volume:/var/log
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+    depends_on:
+      - app
 
   app:
     container_name: sample-app
     image: sample-app
     build:
-      context: ./app/python
+      context: ./app/ruby
     environment:
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4317
-      OTEL_RESOURCE_ATTRIBUTES: service.name=sample-app
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4318
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=app,service.namespace=sample"
       OTEL_LOGS_EXPORTER: otlp
       OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: true
       OTEL_PYTHON_LOG_CORRELATION: true
       OTEL_PYTHON_LOG_LEVEL: info
       PYROSCOPE_SERVER_ADDRESS: http://pyroscope:4040
     ports:
-      - 5002:5002
-    depends_on:
-      - opentelemetry-collector
+      - 5002
 
-  mimir:
-    image: grafana/mimir:2.13.0
-    container_name: mimir
-    command: ["-config.file=/etc/mimir.yaml"]
-    hostname: mimir
-    volumes:
-      - data-volume:/data
-      - ./mimir/mimir.yaml:/etc/mimir.yaml
-    ports:
-      - 9009:9009
 volumes:
   data-volume:
+  log-volume:
