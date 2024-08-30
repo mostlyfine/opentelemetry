@@ -56,6 +56,17 @@ processors:
   resourcedetection:
     detectors: [system]
 
+connectors:
+  spanmetrics:
+    histogram:
+      explicit:
+        buckets: [1ms, 10ms, 100ms, 200ms, 300ms, 400ms, 500ms, 600ms, 700ms, 800ms, 900ms, 1s]
+    dimensions:
+      - name: http.method # extract http.method attribute from span to Prometheus label http_method
+      - name: http.status_code  # extract http.status_code attribute from span to Prometheus label http_status_code
+      - name: http.route  # extract http.route attribute from span to Prometheus label http_route
+    metrics_flush_interval: 3s
+
 exporters:
   otlphttp/prometheus:
     endpoint: http://prometheus:9090/api/v1/otlp
@@ -82,13 +93,7 @@ exporters:
     tls:
       insecure: true
 
-  logging/metrics:
-    verbosity: detailed
-
-  logging/traces:
-    verbosity: detailed
-
-  logging/logs:
+  debug:
     verbosity: detailed
 
 service:
@@ -97,11 +102,15 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [otlphttp/traces]
+      exporters: [otlphttp/traces, spanmetrics]
     metrics:
       receivers: [otlp, prometheus/collector, nginx]
       processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/mimir]
+    metrics/spanmetrics:
+      receivers: [spanmetrics]
+      processors: [memory_limiter, batch]
+      exporters: [prometheusremotewrite, debug]
     logs:
       receivers: [otlp]
       processors: [resourcedetection, memory_limiter, batch]
